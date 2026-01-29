@@ -40,6 +40,8 @@ class User extends Authenticatable implements FilamentUser
         'google_token',
         'google_refresh_token',
         'google_token_expires_in',
+        'ativo',
+        'registro_anterior_id',
     ];
 
     protected $hidden = [
@@ -53,13 +55,14 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'google_token_expires_in' => 'datetime',
+            'ativo' => 'boolean',
         ];
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['id_escola', 'name', 'email', 'email_verified_at', 'email_approved']);
+            ->logOnly(['id_escola', 'name', 'email', 'email_verified_at', 'email_approved', 'ativo']);
     }
 
     public function canAccessPanel(Panel $panel, ?bool $register = false): bool
@@ -129,5 +132,15 @@ class User extends Authenticatable implements FilamentUser
     public function escola()
     {
         return $this->belongsTo(Escola::class, 'id_escola');
+    }
+
+    public function registroAnterior()
+    {
+        return $this->belongsTo(User::class, 'registro_anterior_id');
+    }
+
+    public function historico()
+    {
+        return $this->hasMany(User::class, 'registro_anterior_id');
     }
 }
