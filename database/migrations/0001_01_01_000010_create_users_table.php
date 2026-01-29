@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->boolean('email_approved')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -27,6 +27,16 @@ return new class extends Migration
             $table->text('google_token')->nullable();
             $table->text('google_refresh_token')->nullable();
             $table->datetime('google_token_expires_in')->nullable();
+
+            // Campos de histórico
+            $table->boolean('ativo')->default(true);
+            $table->foreignId('registro_anterior_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            // Índice para buscar registros ativos por email
+            $table->index(['email', 'ativo']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

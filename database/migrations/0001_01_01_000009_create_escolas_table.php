@@ -11,22 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dominio_emails', function (Blueprint $table) {
+        Schema::create('escolas', function (Blueprint $table) {
             $table->id();
-            $table->string('dominio_email');
-            $table->string('setor')->nullable();
-            $table->boolean('status')->default(false);
+            $table->string('nome');
+            $table->string('telefone')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
 
             // Campos de histórico
             $table->boolean('ativo')->default(true);
             $table->foreignId('registro_anterior_id')
                 ->nullable()
-                ->constrained('dominio_emails')
+                ->constrained('escolas')
                 ->nullOnDelete();
 
-            // Índice para buscar registros ativos por domínio
-            $table->index(['dominio_email', 'ativo']);
+            // Índice para buscar registros ativos por nome
+            $table->index(['nome', 'ativo']);
         });
     }
 
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dominio_emails');
+        Schema::dropIfExists('escolas');
     }
 };
