@@ -35,30 +35,30 @@ class DatabaseSeeder extends Seeder
             'Criar Dominios de Email',
             'Editar Dominios de Email',
             'Excluir Dominios de Email',
-            'Listar Séries',
-            'Criar Séries',
-            'Editar Séries',
-            'Excluir Séries',
-            'Listar Veículos',
-            'Criar Veículos',
-            'Editar Veículos',
-            'Excluir Veículos',
+
+            // Escolas
             'Listar Escolas',
             'Criar Escolas',
             'Editar Escolas',
             'Excluir Escolas',
-            'Listar Turmas',
-            'Criar Turmas',
-            'Editar Turmas',
-            'Excluir Turmas',
-            'Listar Alunos',
-            'Criar Alunos',
-            'Editar Alunos',
-            'Excluir Alunos',
-            'Listar Rotas',
-            'Criar Rotas',
-            'Editar Rotas',
-            'Excluir Rotas',
+
+            // Pedidos
+            'Listar Pedidos',
+            'Criar Pedidos',
+            'Editar Pedidos',
+            'Excluir Pedidos',
+
+            // Tipo Status
+            'Listar Tipo Status',
+            'Criar Tipo Status',
+            'Editar Tipo Status',
+            'Excluir Tipo Status',
+
+            // Tipo Manutenção
+            'Listar Tipo Manutencao',
+            'Criar Tipo Manutencao',
+            'Editar Tipo Manutencao',
+            'Excluir Tipo Manutencao',
         ];
 
         $secretarioPermissionsList = [
@@ -66,20 +66,6 @@ class DatabaseSeeder extends Seeder
             'Criar Usuários',
             'Editar Usuários',
             'Excluir Usuários',
-            'Listar Turmas',
-            'Criar Turmas',
-            'Editar Turmas',
-            'Excluir Turmas',
-            'Listar Alunos',
-            'Criar Alunos',
-            'Editar Alunos',
-            'Excluir Alunos',
-        ];
-
-        $usuarioPermissionsList = [
-            'Listar Turmas',
-            'Listar Alunos',
-            'Editar Alunos',
         ];
 
         $password = "Senha@123";
@@ -92,12 +78,10 @@ class DatabaseSeeder extends Seeder
         // Criação da rule Admin
         $adminRole = Role::firstOrCreate(['name' => 'Admin']);
         $secretarioRole = Role::firstOrCreate(['name' => 'Secretario']);
-        $usuarioRole = Role::firstOrCreate(['name' => 'Usuario']);
 
         // Atribui todas as permissões à role Admin
         $adminRole->syncPermissions($permissionsList);
         $secretarioRole->syncPermissions($secretarioPermissionsList);
-        $usuarioRole->syncPermissions($usuarioPermissionsList);
 
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@admin.com'],
@@ -119,19 +103,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $usuarioUser = User::firstOrCreate(
-            ['email' => 'usuario@usuario.com'],
-            [
-                'name' => 'Usuario',
-                'password' => Hash::make($password),
-                'email_verified_at' => now(),
-                'email_approved' => true
-            ]
-        );
 
         $adminUser->assignRole($adminRole);
         $secretarioUser->assignRole($secretarioRole);
-        $usuarioUser->assignRole($usuarioRole);
 
 
         /**
@@ -161,6 +135,30 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->call([]);
+        $this->call([
+            TipoStatusSeeder::class,
+            TipoManutencaoSeeder::class,
+            PedidoFakeSeeder::class,
+        ]);
+
+        // Criação da role Servidor Educação
+        $servidorEducacaoRole = Role::firstOrCreate(['name' => 'Servidor Educação']);
+
+        // Mesmo nível de acesso do admin operacional
+        $servidorEducacaoRole->syncPermissions($permissionsList);
+
+        // Usuário servidor educação (sem escola vinculada)
+        $servidorEducacaoUser = User::firstOrCreate(
+            ['email' => 'educacao@educacao.com'],
+            [
+                'name' => 'Servidor Educação',
+                'password' => Hash::make($password),
+                'email_verified_at' => now(),
+                'email_approved' => true,
+                'id_escola' => null,
+            ]
+        );
+
+        $servidorEducacaoUser->assignRole($servidorEducacaoRole);
     }
 }
